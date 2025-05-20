@@ -19,6 +19,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "chargers-example"
+rootProject.name = "yandex-mobile-school-di"
 include(":app")
  
