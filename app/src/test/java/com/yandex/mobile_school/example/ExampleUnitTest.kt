@@ -1,4 +1,4 @@
-package com.yandex.chargers.example
+package com.yandex.mobile_school.example
 
 import org.junit.Test
 
