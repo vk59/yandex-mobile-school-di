@@ -1,4 +1,4 @@
-package com.yandex.chargers.example
+package com.yandex.mobile_school.example
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
