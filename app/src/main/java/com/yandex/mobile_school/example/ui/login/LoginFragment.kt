@@ -1,5 +1,6 @@
 package com.yandex.mobile_school.example.ui.login
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,14 +12,26 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.yandex.mobile_school.example.R
+import com.yandex.mobile_school.example.appComponent
 import com.yandex.mobile_school.example.databinding.FragmentLoginBinding
 import com.yandex.mobile_school.example.ui.util.viewBinding
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class LoginFragment : Fragment() {
 
   private val binding by viewBinding(FragmentLoginBinding::bind)
+
+  @Inject
+  lateinit var viewModelFactory: ViewModelProvider.Factory
+
   private lateinit var viewModel: LoginViewModel
+
+  override fun onAttach(context: Context) {
+    super.onAttach(context)
+
+    requireContext().appComponent.inject(this)
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -31,8 +44,7 @@ class LoginFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    viewModel = ViewModelProvider(this)[LoginViewModel::class.java]
-
+    viewModel = ViewModelProvider(this, viewModelFactory)[LoginViewModel::class]
     setupListeners()
     observeViewModel()
   }

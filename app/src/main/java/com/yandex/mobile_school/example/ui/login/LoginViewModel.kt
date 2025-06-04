@@ -1,20 +1,19 @@
 package com.yandex.mobile_school.example.ui.login
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yandex.mobile_school.example.YandexMobileSchoolApplication
 import com.yandex.mobile_school.example.data.model.User
-import com.yandex.mobile_school.example.data.repository.UserRepository
+import com.yandex.mobile_school.example.domain.interactor.AuthInteractor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LoginViewModel(application: Application) : AndroidViewModel(application) {
-
-  private val userRepository: UserRepository = YandexMobileSchoolApplication.getUserRepository()
+class LoginViewModel @Inject constructor(
+  private val authInteractor: AuthInteractor,
+) : ViewModel() {
 
   private val _loginState = MutableStateFlow<LoginState>(LoginState.Initial)
   val loginState: StateFlow<LoginState> = _loginState
@@ -24,6 +23,12 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
   private val _password = MutableStateFlow("")
   val password: StateFlow<String> = _password
+
+  init {
+    authInteractor.getCurrentUser()?.let {
+      _loginState.value = LoginState.Success(it)
+    }
+  }
 
   fun setUsername(value: String) {
     _username.value = value
@@ -64,8 +69,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     viewModelScope.launch {
       try {
-        userRepository.login(
-          getApplication(),
+        authInteractor.login(
           username.value,
           password.value
         ).catch { throwable ->

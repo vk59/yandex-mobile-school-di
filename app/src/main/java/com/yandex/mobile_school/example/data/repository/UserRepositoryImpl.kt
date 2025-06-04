@@ -9,15 +9,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import javax.inject.Inject
 
-class UserRepositoryImpl private constructor() : UserRepository {
+class UserRepositoryImpl @Inject constructor(
+  private val context: Context
+) : UserRepository {
 
   private val apiService = RetrofitClient.apiService
 
   private var currentUser: User? = null
   private var authToken: String? = null
 
-  override suspend fun login(context: Context, username: String, password: String): Flow<User> = flow {
+  override suspend fun login(username: String, password: String): Flow<User> = flow {
     try {
       val loginRequest = LoginRequest(username, password)
       val loginResponse = apiService.login(loginRequest)
@@ -49,17 +52,7 @@ class UserRepositoryImpl private constructor() : UserRepository {
     }
   }.flowOn(Dispatchers.IO)
 
-  override fun getUserDetails(userId: String): Flow<User> = flow {
-    try {
-      val user = apiService.getUserDetails(userId)
-      emit(user)
-    } catch (e: Exception) {
-      Log.e(TAG, "Get user details error", e)
-      throw e
-    }
-  }.flowOn(Dispatchers.IO)
-
-  override fun getAuthToken(context: Context): String? {
+  override fun getAuthToken(): String? {
     if (authToken != null) {
       return authToken
     }
@@ -69,12 +62,12 @@ class UserRepositoryImpl private constructor() : UserRepository {
     return authToken
   }
 
-  override fun getUserId(context: Context): String? {
+  override fun getUserId(): String? {
     val sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
     return sharedPreferences.getString(KEY_USER_ID, null)
   }
 
-  override suspend fun logout(context: Context) {
+  override suspend fun logout() {
     val sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
     sharedPreferences.edit().clear().apply()
     currentUser = null

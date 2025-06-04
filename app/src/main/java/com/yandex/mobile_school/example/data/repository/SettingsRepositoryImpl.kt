@@ -1,8 +1,11 @@
 package com.yandex.mobile_school.example.data.repository
 
 import android.content.Context
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class SettingsRepositoryImpl private constructor() : SettingsRepository {
+@Singleton
+class SettingsRepositoryImpl @Inject constructor() : SettingsRepository {
 
   override fun setDarkMode(context: Context, enabled: Boolean) {
     val sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
@@ -44,14 +47,5 @@ class SettingsRepositoryImpl private constructor() : SettingsRepository {
     private const val KEY_DARK_MODE = "dark_mode"
     private const val KEY_NOTIFICATIONS_ENABLED = "notifications_enabled"
     private const val KEY_LANGUAGE = "language"
-
-    @Volatile
-    private var instance: SettingsRepositoryImpl? = null
-
-    fun getInstance(): SettingsRepositoryImpl {
-      return instance ?: synchronized(this) {
-        instance ?: SettingsRepositoryImpl().also { instance = it }
-      }
-    }
   }
 }
