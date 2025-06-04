@@ -1,33 +1,32 @@
 package com.yandex.mobile_school.example.ui.profile
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yandex.mobile_school.example.YandexMobileSchoolApplication
 import com.yandex.mobile_school.example.data.model.User
-import com.yandex.mobile_school.example.data.repository.UserRepository
+import com.yandex.mobile_school.example.domain.interactor.ProfileDetailsInteractor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ProfileDetailsViewModel(application: Application) : AndroidViewModel(application) {
-  private val userRepository: UserRepository = YandexMobileSchoolApplication.getUserRepository()
+class ProfileDetailsViewModel @Inject constructor(
+  private val profileDetailsInteractor: ProfileDetailsInteractor,
+) : ViewModel() {
 
   private val _profileDetailsState = MutableStateFlow<ProfileDetailsState>(ProfileDetailsState.Loading)
   val profileDetailsState: StateFlow<ProfileDetailsState> = _profileDetailsState
 
   init {
-    val userId = userRepository.getUserId(getApplication()) ?: "defaultUserId"
-    loadUserDetails(userId)
+    loadUserDetails()
   }
 
-  private fun loadUserDetails(userId: String) {
+  private fun loadUserDetails() {
     _profileDetailsState.value = ProfileDetailsState.Loading
 
     viewModelScope.launch {
-      userRepository.getUserDetails(userId)
+      profileDetailsInteractor.listenToUserDetails()
         .catch { throwable ->
           Log.e("ProfileDetailsViewModel", "Load user details error", throwable)
           _profileDetailsState.value = ProfileDetailsState.Error(throwable.message ?: "Unknown error")

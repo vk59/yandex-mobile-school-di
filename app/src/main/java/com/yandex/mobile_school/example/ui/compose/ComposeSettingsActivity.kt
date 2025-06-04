@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModelProvider
+import com.yandex.mobile_school.example.appComponent
+import javax.inject.Inject
 
 /**
  * Activity that hosts the Compose Settings screen.
@@ -14,8 +17,15 @@ import androidx.compose.ui.Modifier
  */
 class ComposeSettingsActivity : ComponentActivity() {
 
+  @Inject
+  lateinit var viewModelFactory: ViewModelProvider.Factory
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    
+    // Inject dependencies
+    appComponent.inject(this)
+    
     setContent {
       MaterialTheme {
         Surface(
@@ -23,7 +33,8 @@ class ComposeSettingsActivity : ComponentActivity() {
           color = MaterialTheme.colorScheme.background
         ) {
           ComposeSettingsScreen(
-            onNavigateBack = { finish() }
+            onNavigateBack = { finish() },
+            viewModelFactory = viewModelFactory
           )
         }
       }

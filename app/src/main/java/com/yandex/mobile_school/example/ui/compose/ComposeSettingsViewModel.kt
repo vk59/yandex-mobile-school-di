@@ -1,24 +1,24 @@
 package com.yandex.mobile_school.example.ui.compose
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import android.content.Context
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yandex.mobile_school.example.YandexMobileSchoolApplication
 import com.yandex.mobile_school.example.data.repository.SettingsRepository
+import com.yandex.mobile_school.example.di.module.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * ViewModel for the Compose Settings screen.
  * Uses StateFlow for reactive state management.
  */
-class ComposeSettingsViewModel(application: Application) : AndroidViewModel(application) {
-
-    // Get the repository from the Application companion object
-    private val settingsRepository: SettingsRepository = YandexMobileSchoolApplication.getSettingsRepository()
+class ComposeSettingsViewModel @Inject constructor(
+    private val settingsRepository: SettingsRepository,
+    @ApplicationContext private val context: Context
+) : ViewModel() {
     
-    // Settings state
     private val _darkModeEnabled = MutableStateFlow(false)
     val darkModeEnabled: StateFlow<Boolean> = _darkModeEnabled
     
@@ -28,7 +28,6 @@ class ComposeSettingsViewModel(application: Application) : AndroidViewModel(appl
     private val _language = MutableStateFlow("en")
     val language: StateFlow<String> = _language
     
-    // Language data
     private val _languages = MutableStateFlow(listOf("English", "Spanish", "French", "German", "Russian"))
     val languages: StateFlow<List<String>> = _languages
     
@@ -40,7 +39,6 @@ class ComposeSettingsViewModel(application: Application) : AndroidViewModel(appl
     }
     
     private fun loadSettings() {
-        val context = getApplication<Application>()
         _darkModeEnabled.value = settingsRepository.isDarkModeEnabled(context)
         _notificationsEnabled.value = settingsRepository.areNotificationsEnabled(context)
         _language.value = settingsRepository.getLanguage(context)
@@ -48,28 +46,28 @@ class ComposeSettingsViewModel(application: Application) : AndroidViewModel(appl
     
     fun setDarkMode(enabled: Boolean) {
         viewModelScope.launch {
-            settingsRepository.setDarkMode(getApplication(), enabled)
+            settingsRepository.setDarkMode(context, enabled)
             _darkModeEnabled.value = enabled
         }
     }
     
     fun setNotificationsEnabled(enabled: Boolean) {
         viewModelScope.launch {
-            settingsRepository.setNotificationsEnabled(getApplication(), enabled)
+            settingsRepository.setNotificationsEnabled(context, enabled)
             _notificationsEnabled.value = enabled
         }
     }
     
     fun setLanguage(languageCode: String) {
         viewModelScope.launch {
-            settingsRepository.setLanguage(getApplication(), languageCode)
+            settingsRepository.setLanguage(context, languageCode)
             _language.value = languageCode
         }
     }
     
     fun resetAllSettings() {
         viewModelScope.launch {
-            settingsRepository.resetAllSettings(getApplication())
+            settingsRepository.resetAllSettings(context)
             loadSettings()
         }
     }

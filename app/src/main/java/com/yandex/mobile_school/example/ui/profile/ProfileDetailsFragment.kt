@@ -1,5 +1,6 @@
 package com.yandex.mobile_school.example.ui.profile
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,15 +10,27 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.yandex.mobile_school.example.R
+import com.yandex.mobile_school.example.appComponent
 import com.yandex.mobile_school.example.data.model.User
 import com.yandex.mobile_school.example.databinding.FragmentProfileDetailsBinding
+import com.yandex.mobile_school.example.di.module.ViewModelFactory
 import com.yandex.mobile_school.example.ui.util.viewBinding
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class ProfileDetailsFragment : Fragment() {
 
   private val binding by viewBinding(FragmentProfileDetailsBinding::bind)
+
   private lateinit var viewModel: ProfileDetailsViewModel
+
+  @Inject
+  lateinit var viewModelFactory: ViewModelProvider.Factory
+
+  override fun onAttach(context: Context) {
+    super.onAttach(context)
+    requireContext().appComponent.inject(this)
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -30,7 +43,7 @@ class ProfileDetailsFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    viewModel = ViewModelProvider(this)[ProfileDetailsViewModel::class.java]
+    viewModel = viewModelFactory.create(ProfileDetailsViewModel::class.java)
     observeViewModel()
   }
 

@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 /**
@@ -39,8 +40,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun ComposeSettingsScreen(
   onNavigateBack: () -> Unit,
+  viewModelFactory: ViewModelProvider.Factory
 ) {
-  val viewModel: ComposeSettingsViewModel = viewModel()
+  val viewModel: ComposeSettingsViewModel = viewModel(factory = viewModelFactory)
 
   val darkModeEnabled by viewModel.darkModeEnabled.collectAsState()
   val notificationsEnabled by viewModel.notificationsEnabled.collectAsState()

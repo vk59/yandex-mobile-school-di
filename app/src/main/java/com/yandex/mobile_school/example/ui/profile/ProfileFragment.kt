@@ -1,5 +1,6 @@
 package com.yandex.mobile_school.example.ui.profile
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,16 +12,31 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.yandex.mobile_school.example.R
+import com.yandex.mobile_school.example.appComponent
 import com.yandex.mobile_school.example.data.model.User
 import com.yandex.mobile_school.example.databinding.FragmentProfileBinding
+import com.yandex.mobile_school.example.domain.interactor.AuthInteractor
 import com.yandex.mobile_school.example.ui.compose.ComposeSettingsActivity
 import com.yandex.mobile_school.example.ui.util.viewBinding
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class ProfileFragment : Fragment() {
 
   private val binding by viewBinding(FragmentProfileBinding::bind)
+
+  @Inject
+  lateinit var viewModelFactory: ViewModelProvider.Factory
+
+  @Inject
+  lateinit var authInteractor: AuthInteractor
+
   private lateinit var viewModel: ProfileViewModel
+
+  override fun onAttach(context: Context) {
+    super.onAttach(context)
+    requireContext().appComponent.inject(this)
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -33,7 +49,7 @@ class ProfileFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    viewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
+    viewModel = viewModelFactory.create(ProfileViewModel::class.java)
 
     setupListeners()
     observeViewModel()
